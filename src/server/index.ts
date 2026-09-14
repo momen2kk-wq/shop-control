@@ -1,4 +1,5 @@
 import "dotenv/config";
+import path from "node:path";
 import express from "express";
 import cors from "cors";
 import jwt from "jsonwebtoken";
@@ -96,7 +97,11 @@ app.get("/api/dashboard",auth,(req:any,res)=>{
  ok(res,{dashboard:{todaySales:today.total,todayProfit:today.profit,todayTransactions:today.count,monthSales:sales.total,monthProfit:sales.profit,monthTransactions:sales.count,monthExpenses:expenses.total,lowStock:low.count,outOfStock:out.count}});
 });
 
-app.use(express.static("."));
-const port=Number(process.env.PORT||4000);app.listen(port,()=>console.log(`Shop Control API running on http://localhost:${port}`));
-// Add '0.0.0.0' right after the port variable
-//app.listen(port, '0.0.0.0', () => console.log(`Shop Control API running on port ${port}`));
+const webRoot=process.env.WEB_ROOT||path.resolve("dist");
+app.use(express.static(webRoot));
+app.use((req,res,next)=>{
+  if(req.path.startsWith("/api/")) return next();
+  res.sendFile(path.join(webRoot,"index.html"),err=>{if(err)next(err)});
+});
+const port=Number(process.env.PORT||4000);
+app.listen(port,"0.0.0.0",()=>console.log(`Shop Control API running on port ${port}`));
