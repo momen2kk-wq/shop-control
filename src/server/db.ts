@@ -10,7 +10,7 @@ export const db=new Database(file);
 db.pragma("journal_mode = WAL");
 db.exec(`
 CREATE TABLE IF NOT EXISTS shops(
- id TEXT PRIMARY KEY,name TEXT NOT NULL,phone TEXT,email TEXT,created_at TEXT NOT NULL
+ id TEXT PRIMARY KEY,name TEXT NOT NULL,phone TEXT,email TEXT,currency TEXT NOT NULL DEFAULT 'NGN',created_at TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS users(
  id TEXT PRIMARY KEY,shop_id TEXT NOT NULL,name TEXT NOT NULL,email TEXT UNIQUE NOT NULL,password_hash TEXT NOT NULL,role TEXT NOT NULL DEFAULT 'owner',created_at TEXT NOT NULL,
@@ -40,6 +40,7 @@ CREATE INDEX IF NOT EXISTS idx_products_shop ON products(shop_id);
 CREATE INDEX IF NOT EXISTS idx_sales_shop_date ON sales(shop_id,created_at);
 CREATE INDEX IF NOT EXISTS idx_expenses_shop_date ON expenses(shop_id,created_at);
 `);
+try { db.exec("ALTER TABLE shops ADD COLUMN currency TEXT NOT NULL DEFAULT 'NGN'"); } catch {}
 
 export const id=()=>crypto.randomUUID();
 export const now=()=>new Date().toISOString();

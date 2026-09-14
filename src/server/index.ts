@@ -31,7 +31,15 @@ app.post("/api/auth/login",async(req,res)=>{
  ok(res,{token:token(u),user:{name:u.name,email:u.email,shopName:u.shop_name}});
 });
 
-app.get("/api/me",auth,(req:any,res)=>{const u:any=db.prepare("SELECT u.name,u.email,u.role,s.name shopName,s.phone FROM users u JOIN shops s ON s.id=u.shop_id WHERE u.id=?").get(req.user.userId);ok(res,{user:u})});
+app.get("/api/me",auth,(req:any,res)=>{const u:any=db.prepare("SELECT u.name,u.email,u.role,s.name shopName,s.phone,s.currency FROM users u JOIN shops s ON s.id=u.shop_id WHERE u.id=?").get(req.user.userId);ok(res,{user:u})});
+app.put("/api/settings",auth,(req:any,res)=>{
+ const {shopName,phone,currency}=req.body||{};
+ const allowed=["NGN","USD","GBP","EUR","GHS","KES","ZAR","CAD","AUD","AED","INR"];
+ if(currency && !allowed.includes(currency)) return res.status(400).json({error:"Unsupported currency"});
+ db.prepare("UPDATE shops SET name=COALESCE(NULLIF(?,''),name), phone=COALESCE(?,phone), currency=COALESCE(?,currency) WHERE id=?").run(shopName||"",phone??null,currency||null,req.user.shopId);
+ const shop:any=db.prepare("SELECT name shopName,phone,currency FROM shops WHERE id=?").get(req.user.shopId);
+ ok(res,{shop});
+});
 app.get("/api/data",auth,(req:any,res)=>ok(res,getShopData(req.user.shopId)));
 
 app.post("/api/products",auth,(req:any,res)=>{
@@ -88,10 +96,5 @@ app.get("/api/dashboard",auth,(req:any,res)=>{
  ok(res,{dashboard:{todaySales:today.total,todayProfit:today.profit,todayTransactions:today.count,monthSales:sales.total,monthProfit:sales.profit,monthTransactions:sales.count,monthExpenses:expenses.total,lowStock:low.count,outOfStock:out.count}});
 });
 
-const webRoot = process.env.WEB_ROOT || "./dist";
-app.use(express.static(webRoot));
-app.get("*", (req,res,next)=>{
-  if(req.path.startsWith("/api/")) return next();
-  res.sendFile("index.html", {root:webRoot});
-});
+app.use(express.static("."));
 const port=Number(process.env.PORT||4000);app.listen(port,()=>console.log(`Shop Control API running on http://localhost:${port}`));
