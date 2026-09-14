@@ -94,4 +94,10 @@ app.get("*", (req,res,next)=>{
   if(req.path.startsWith("/api/")) return next();
   res.sendFile("index.html", {root:webRoot});
 });
-const port=Number(process.env.PORT||4000);app.listen(port,()=>console.log(`Shop Control API running on http://localhost:${port}`));
+//const port=Number(process.env.PORT||4000);app.listen(port,()=>console.log(`Shop Control API running on http://localhost:${port}`));
+const port = Number(process.env.PORT || 4000);
+
+// Add '0.0.0.0' right after the port variable
+app.listen(port, '0.0.0.0', () => console.log(`Shop Control API running on port ${port}`));
+
+
