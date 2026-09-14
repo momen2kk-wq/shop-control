@@ -100,14 +100,3 @@ app.use(express.static("."));
 //const port=Number(process.env.PORT||4000);app.listen(port,()=>console.log(`Shop Control API running on http://localhost:${port}`));
 // Add '0.0.0.0' right after the port variable
 app.listen(port, '0.0.0.0', () => console.log(`Shop Control API running on port ${port}`));
-// WARNING: Protect this route in production so strangers can't see your users!
-app.get('/api/admin/users', (req, res) => {
-  try {
-    // Replace 'users' with your actual database table name
-    const stmt = db.prepare('SELECT id, email, name, createdAt FROM users'); 
-    const users = stmt.all();
-    res.json(users);
-  } catch (error) {
-    res.status(500).json({ error: (error as Error).message });
-  }
-});
