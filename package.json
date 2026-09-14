@@ -1,4 +1,10 @@
 {
+  "scripts": {
+    "build": "tsc", 
+    "start": "node dist/server/index.js"
+  }
+
+{
   "name": "shop-control-production",
   "version": "1.0.0",
   "private": true,
@@ -25,4 +31,5 @@
     "tsx": "^4.19.2",
     "vite": "^6.0.5"
   }
+}
 }
