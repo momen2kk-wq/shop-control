@@ -97,6 +97,6 @@ app.get("/api/dashboard",auth,(req:any,res)=>{
 });
 
 app.use(express.static("."));
-//const port=Number(process.env.PORT||4000);app.listen(port,()=>console.log(`Shop Control API running on http://localhost:${port}`));
+const port=Number(process.env.PORT||4000);app.listen(port,()=>console.log(`Shop Control API running on http://localhost:${port}`));
 // Add '0.0.0.0' right after the port variable
-app.listen(port, '0.0.0.0', () => console.log(`Shop Control API running on port ${port}`));
+//app.listen(port, '0.0.0.0', () => console.log(`Shop Control API running on port ${port}`));
