@@ -23,6 +23,6 @@
     "react": "latest",
     "react-dom": "latest",
     "tsx": "latest",
-    "vite": "latest"
+    "vite": "5.4.14"
   }
 }
