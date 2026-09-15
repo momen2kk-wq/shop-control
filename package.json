@@ -11,8 +11,7 @@
     "start": "tsx server/index.ts"
   },
   "dependencies": {
-"@vitejs/plugin-react": "4.3.4",
-"bcryptjs": "latest"
+    "@vitejs/plugin-react": "latest",
     "bcryptjs": "latest",
     "better-sqlite3": "latest",
     "concurrently": "latest",
@@ -24,6 +23,6 @@
     "react": "latest",
     "react-dom": "latest",
     "tsx": "latest",
-    "vite": "5.4.14"
+    "vite": "latest"
   }
 }
