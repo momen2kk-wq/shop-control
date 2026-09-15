@@ -1,4 +1,5 @@
 import "dotenv/config";
+import path from "node:path";
 import express from "express";
 import cors from "cors";
 import jwt from "jsonwebtoken";
@@ -6,6 +7,7 @@ import bcrypt from "bcryptjs";
 import {db,id,now,seedShop,getShopData} from "./db.js";
 
 const app=express(); app.use(cors()); app.use(express.json());
+app.use("/api",(_req:any,res:any,next:any)=>{res.setHeader("Cache-Control","no-store, no-cache, must-revalidate, proxy-revalidate");res.setHeader("Pragma","no-cache");res.setHeader("Expires","0");next()});
 const SECRET=process.env.JWT_SECRET||"dev-secret-change-me";
 const auth=(req:any,res:any,next:any)=>{try{const h=req.headers.authorization||"";if(!h.startsWith("Bearer "))throw 0;req.user=jwt.verify(h.slice(7),SECRET);next()}catch{res.status(401).json({error:"Unauthorized"})}};
 const token=(u:any)=>jwt.sign({userId:u.id,shopId:u.shop_id,role:u.role},SECRET,{expiresIn:"30d"});
@@ -96,5 +98,12 @@ app.get("/api/dashboard",auth,(req:any,res)=>{
  ok(res,{dashboard:{todaySales:today.total,todayProfit:today.profit,todayTransactions:today.count,monthSales:sales.total,monthProfit:sales.profit,monthTransactions:sales.count,monthExpenses:expenses.total,lowStock:low.count,outOfStock:out.count}});
 });
 
-app.use(express.static("."));
-const port=Number(process.env.PORT||4000);app.listen(port,()=>console.log(`Shop Control API running on http://localhost:${port}`));
+const webRoot=process.env.WEB_ROOT||path.resolve("dist");
+app.use("/sw.js",express.static(path.join(webRoot,"sw.js"),{setHeaders:(res:any)=>res.setHeader("Cache-Control","no-store")}));
+app.use(express.static(webRoot,{setHeaders:(res:any,file:string)=>{if(file.endsWith("index.html"))res.setHeader("Cache-Control","no-store, no-cache, must-revalidate");}}));
+app.use((req,res,next)=>{
+  if(req.path.startsWith("/api/")) return next();
+  res.sendFile(path.join(webRoot,"index.html"),err=>{if(err)next(err)});
+});
+const port=Number(process.env.PORT||4000);
+app.listen(port,"0.0.0.0",()=>console.log(`Shop Control API running on port ${port}`));
